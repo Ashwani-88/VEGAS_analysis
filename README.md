@@ -9,7 +9,7 @@ Step 2: Copy create_download_scp.py to the directory and run
 Python create_download_scp.py
 It will create two files run_ids.txt and unique_flashers.txt
 
-Step 3: Check all four laser files are the same and if now then generate script to combine laser files. 
+Step 3: Check that all four laser files are the same, and if not, then generate a script to combine the laser files. Change out_dir name in the check_same_flashers.py file !!
 Python check_same_flashers.py
 
 Step 4: cp runlist.txt run_ids.txt unique_flashers.txt /home/apandey/
@@ -21,9 +21,9 @@ Python stage1_flasher.py
 
 Step 6: copy read_error.sh file to log directory in the working directory.
 Change the file name in read_error.sh. And then run it
-Bash read_error.sh
+bash read_error.sh
 
-It will print any error reported during different stages. 
+It will print any errors reported during different stages. 
 
 Stage 7: 
 
