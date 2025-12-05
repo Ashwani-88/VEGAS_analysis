@@ -1,9 +1,9 @@
 # VEGAS_analysis
 Steps for analyzing VERITAS data and required scripts.  
 
-Step 1: Make sure you have the following file in the current directory.
+Step 1: Make sure you have the following files in the current directory.
 runlist_ext.csv  runlist.txt
-(can be downloaded from the logen)
+(can be downloaded from the logen: https://veritasm.sao.arizona.edu/DQM/loggen.html)
 
 Step 2: Copy create_download_scp.py to the directory and run
 Python create_download_scp.py
