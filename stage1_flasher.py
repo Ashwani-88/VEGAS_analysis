@@ -1,0 +1,65 @@
+import subprocess
+import concurrent.futures
+
+working_dir='/mnt/data/apandey/op313_latest/veritas_latest_results'
+data_dir='/mnt/data/vbf'
+
+def submit_slurm_job(obs_id):
+    """
+    Submits a SLURM job for a given observation ID.
+    """
+    # Define the SLURM job script or command
+    slurm_script = f"""#!/bin/bash
+#SBATCH --job-name=obs_{obs_id}
+#SBATCH --output=obs_{obs_id}.out
+#SBATCH --error=obs_{obs_id}.err
+#SBATCH --ntasks=1
+
+# Your command to process the observation ID
+echo "Processing observation ID: {obs_id}"
+vaStage1 -Stage1_RunMode=flasher {data_dir}/{obs_id}.cvbf {working_dir}/out/stg1/{obs_id}_flasher.root >> {working_dir}/log/{obs_id}_laser.log 2>&1
+echo "Done processing observation ID:  {obs_id}"
+"""
+
+    # Write the SLURM script to a temporary file
+    script_filename = f"slurm_job_{obs_id}_stg1.sh"
+    with open(script_filename, "w") as f:
+        f.write(slurm_script)
+
+    # Submit the SLURM job
+    command = ["sbatch", script_filename]
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    # Print the result of the submission
+    if result.returncode == 0:
+        print(f"Successfully submitted job for obs_id: {obs_id}")
+    else:
+        print(f"Failed to submit job for obs_id: {obs_id}. Error: {result.stderr}")
+
+def read_obs_ids(filename):
+    """
+    Reads observation IDs from the first column of a file.
+    """
+    obs_ids = []
+    with open(filename, "r") as f:
+        for line in f:
+            obs_id = line.strip().split()[0]  # Assuming the first column contains the obs_id
+            obs_ids.append(obs_id)
+    return obs_ids
+
+def main():
+    # File containing observation IDs
+    filename = "unique_flashers.txt"
+
+    # Read observation IDs from the file
+    obs_ids = read_obs_ids(filename)
+    max_jobs = 25
+    # Submit jobs in parallel using ThreadPoolExecutor
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_jobs) as executor:
+        futures = [executor.submit(submit_slurm_job, obs_id) for obs_id in obs_ids]
+
+        # Wait for all futures to complete
+        concurrent.futures.wait(futures)
+
+if __name__ == "__main__":
+    main()
